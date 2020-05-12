@@ -13,6 +13,7 @@ class Job(db.Document):
 
 class User(db.Document):
     email = EmailField(required=True, unique=True)
+    display_name = StringField(required=True, min_length=3)
     password = StringField(required=True, min_length=6)
     jobs = ListField(ReferenceField('Job', reverse_delete_rule=PULL))
 
