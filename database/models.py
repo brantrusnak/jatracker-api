@@ -1,4 +1,4 @@
-from mongoengine import StringField, ListField, ReferenceField, EmailField, PULL, CASCADE
+from mongoengine import StringField, ListField, ReferenceField, FileField, EmailField, PULL, CASCADE
 from .db import db
 from flask_bcrypt import generate_password_hash, check_password_hash
 
@@ -7,8 +7,8 @@ class Job(db.Document):
     position = StringField(required=True)
     status = StringField(required=True)
     notes = StringField(required=True)
-    resume = StringField(required=False)
-    cover_letter = StringField(required=False)
+    resume = FileField(required=False)
+    coverletter = FileField(required=False)
     added_by = ReferenceField('User')
 
 class User(db.Document):

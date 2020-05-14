@@ -19,9 +19,13 @@ class JobsApi(Resource):
     def post(self):
         try:
             user_id = get_jwt_identity()
-            body = request.get_json()
+            body = request.form.to_dict()
             user = User.objects.get(id=user_id)
             job = Job(**body, added_by=user)
+            files = request.files.to_dict()
+            for file in files:
+                if len(files[file].read()) != 0:
+                    job[file].put(files[file].read(), content_type = 'application/pdf')
             job.save()
             user.update(push__jobs=job)
             user.save()
@@ -37,8 +41,13 @@ class JobApi(Resource):
         try:
             user_id = get_jwt_identity()
             job = Job.objects.get(id=id, added_by=user_id)
-            body = request.get_json()
+            body = request.form.to_dict()
+            files = request.files.to_dict()
+            for file in files:
+                if len(files[file].read()) != 0:
+                    job[file].replace(files[file].read(), content_type = 'application/pdf')
             Job.objects.get(id=id).update(**body)
+            job.save()
             return {'updated': True}, 200
         except (NoAuthorizationError, Exception):
             raise UnauthorizedError
@@ -57,7 +66,7 @@ class JobApi(Resource):
     @jwt_required
     def get(self, id):
         try:
-            jobs = Job.objects.get(id=id).to_json()
-            return Response(jobs, mimetype="application/json", status=200)
+            job = Job.objects.get(id=id).to_json()
+            return Response(job, mimetype="application/json", status=200)
         except (NoAuthorizationError, Exception):
             raise UnauthorizedError
