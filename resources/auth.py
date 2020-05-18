@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token
 from database.models import User
 from flask_restful import Resource
 import datetime
-
+import json
 
 class SignupApi(Resource):
     def post(self):
@@ -24,8 +24,7 @@ class LoginApi(Resource):
             if not authorized:
                 raise NoAuthorizationError
             expires = datetime.timedelta(days=7)
-            access_token = create_access_token(
-                identity=str(user.id), expires_delta=expires)
-            return {'token': access_token}, 200
+            access_token = create_access_token(identity=str(user.id), expires_delta=expires)
+            return {'token': access_token, 'user': json.loads(User.objects.exclude('password').get(email=body.get('email')).to_json()) }, 200
         except (NoAuthorizationError, Exception):
             raise UnauthorizedError
