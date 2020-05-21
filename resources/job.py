@@ -24,7 +24,9 @@ class JobsApi(Resource):
             job = Job(**body, added_by=user)
             files = request.files.to_dict()
             for file in files:
-                job[file].put(request.files[file], content_type = 'application/pdf')
+                if len(files[file].read()) != 0:
+                    request.files[file].seek(0)
+                    job[file].put(request.files[file], content_type = 'application/pdf')
             job.save()
             user.update(push__jobs=job)
             user.save()
