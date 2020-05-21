@@ -44,7 +44,9 @@ class JobApi(Resource):
             job.update(**body)
             files = request.files.to_dict()
             for file in files:
-                job[file].replace(request.files[file], content_type = 'application/pdf')
+                if len(files[file].read()) != 0:
+                    request.files[file].seek(0)
+                    job[file].replace(request.files[file], content_type = 'application/pdf')
             job.save()
             return {'updated': True}, 200
         except (NoAuthorizationError, Exception):
