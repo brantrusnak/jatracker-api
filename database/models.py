@@ -7,8 +7,8 @@ class Job(db.Document):
     position = StringField(required=True)
     status = StringField(required=True)
     notes = StringField(required=True)
-    resume = FileField(required=False)
-    coverletter = FileField(required=False)
+    resume = FileField(required=False, collection_name="resume")
+    coverletter = FileField(required=False, collection_name="coverletter")
     added_by = ReferenceField('User')
 
 class User(db.Document):

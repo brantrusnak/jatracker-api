@@ -24,8 +24,7 @@ class JobsApi(Resource):
             job = Job(**body, added_by=user)
             files = request.files.to_dict()
             for file in files:
-                if len(files[file].read()) != 0:
-                    job[file].put(files[file].read(), content_type = 'application/pdf')
+                job[file].put(request.files[file], content_type = 'application/pdf')
             job.save()
             user.update(push__jobs=job)
             user.save()
@@ -42,11 +41,10 @@ class JobApi(Resource):
             user_id = get_jwt_identity()
             job = Job.objects.get(id=id, added_by=user_id)
             body = request.form.to_dict()
+            job.update(**body)
             files = request.files.to_dict()
             for file in files:
-                if len(files[file].read()) != 0:
-                    job[file].replace(files[file].read(), content_type = 'application/pdf')
-            Job.objects.get(id=id).update(**body)
+                job[file].replace(request.files[file], content_type = 'application/pdf')
             job.save()
             return {'updated': True}, 200
         except (NoAuthorizationError, Exception):
@@ -55,7 +53,6 @@ class JobApi(Resource):
     @jwt_required
     def delete(self, id):
         try:
-            pass
             user_id = get_jwt_identity()
             job = Job.objects.get(id=id, added_by=user_id)
             job.delete()
