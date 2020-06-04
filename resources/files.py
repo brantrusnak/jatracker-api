@@ -11,7 +11,7 @@ class ResumeApi(Resource):
         try:
             user_id = get_jwt_identity()
             job = Job.objects.get(id=job_id, added_by=user_id)
-            return Response(job.resume.read(), mimetype="application/pdf", content_type=job.coverletter.content_type, status=200)
+            return Response(job.resume.read(), mimetype="application/pdf", content_type=job.resume.content_type, status=200)
         except (NoAuthorizationError, Exception):
             raise UnauthorizedError
 
